@@ -48,7 +48,8 @@ func CreateTable(db *sql.DB) error {
 		like INTEGER NOT NULL,
 		dislike INTEGER NOT NULL,
 		category TEXT NOT NULL,
-		born TEXT NOT NULL
+		born TEXT NOT NULL,
+		image_URL TEXT 
 	);
 	`
 	session := `
@@ -68,7 +69,8 @@ func CreateTable(db *sql.DB) error {
 		message TEXT NOT NULL,
 		like INTEGER NOT NULL,
 		dislike INTEGER NOT NULL,
-		born TEXT NOT NULL
+		born TEXT NOT NULL,
+		image_URL TEXT 
 	)
 	`
 
