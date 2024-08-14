@@ -2,9 +2,8 @@ package repository
 
 import (
 	"database/sql"
-	"log"
-
 	"forum/app/config"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )

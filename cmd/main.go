@@ -27,12 +27,17 @@ const (
 )
 
 func main() {
-
 	err := os.MkdirAll(uploadPath, os.ModePerm)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
+	http.HandleFunc("/test", uploadPage)
+	http.HandleFunc("/upload", uploadFile)
+	http.HandleFunc("/uploads/", serveImage)
+	fmt.Println("Server starting on http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 
 	cfg, err := config.InitConfig("./config/config.json")
 	if err != nil {
@@ -61,10 +66,6 @@ func main() {
 
 	app := handlers.NewAppService(authservice, sessionService, postService, userservice, cfg)
 	server := app.Run(cfg.Http)
-
-	http.HandleFunc("/test", uploadPage)
-	http.HandleFunc("/upload", uploadFile)
-	http.HandleFunc("/uploads/", serveImage)
 
 	go app.ClearSession()
 

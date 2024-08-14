@@ -61,12 +61,33 @@ func (p postQuery) GetAllPosts() ([]models.Post, error) {
 	var all []models.Post
 	for rows.Next() {
 		var post models.Post
-		err := rows.Scan(&post.Id, &post.Author.ID, &post.Author.Username, &post.Title, &post.Content, &post.Like, &post.Dislike, &post.Category, &post.CreatedTime)
+		var imageURL sql.NullString
+
+		err := rows.Scan(
+			&post.Id,
+			&post.Author.ID,
+			&post.Author.Username,
+			&post.Title,
+			&post.Content,
+			&post.Like,
+			&post.Dislike,
+			&post.Category,
+			&post.CreatedTime,
+			&imageURL,
+		)
 		if err != nil {
 			return []models.Post{}, err
 		}
+
+		if imageURL.Valid {
+			post.ImageURL = imageURL.String
+		} else {
+			post.ImageURL = "" // Or any default valuess
+		}
+
 		all = append(all, post)
 	}
+
 	return all, nil
 }
 

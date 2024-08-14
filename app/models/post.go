@@ -10,4 +10,5 @@ type Post struct {
 	Like        int64
 	Dislike     int64
 	CreatedTime string
+	ImageURL    string
 }
