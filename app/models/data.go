@@ -7,4 +7,5 @@ type Data struct {
 	Comment     []Comment
 	InitialPost Post
 	Genre       string
+	ImageURL    string
 }

@@ -68,8 +68,7 @@ func CreateTable(db *sql.DB) error {
 		message TEXT NOT NULL,
 		like INTEGER NOT NULL,
 		dislike INTEGER NOT NULL,
-		born TEXT NOT NULL,
-		image_URL TEXT 
+		born TEXT NOT NULL
 	)
 	`
 

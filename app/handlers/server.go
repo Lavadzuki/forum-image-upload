@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"forum/app/config"
 	"net/http"
+	"path/filepath"
 	"time"
 )
 
@@ -27,6 +29,8 @@ func (app *App) Run(cfg config.Http) *http.Server {
 	AddAuthPath(authPaths...)
 
 	mux := http.NewServeMux()
+	// http.HandleFunc("/upload", uploadFile)
+	// http.HandleFunc("/uploads/", serveImage)
 	mux.HandleFunc("/", app.authorizedMiddleware(app.HomeHandler))                  // home
 	mux.HandleFunc("/post/", app.authorizedMiddleware(app.PostHandler))             // post
 	mux.HandleFunc("/post/like/", app.authorizedMiddleware(app.ReactionHandler))    // reaction
@@ -45,9 +49,12 @@ func (app *App) Run(cfg config.Http) *http.Server {
 	mux.HandleFunc("/welcome/filter/", app.nonAuthorizedMiddleware(app.WelcomeFilterHandler))   // filter
 	mux.HandleFunc("/welcome/comment/", app.nonAuthorizedMiddleware(app.WelcomeCommentHandler)) // comment
 
+	fs1 := http.FileServer(http.Dir("./uploads"))
 	fs := http.FileServer(http.Dir("./templates/static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	mux.Handle("/uploads/", http.StripPrefix("/uploads/", fs1))
 
+	// src = "/static/img/ArcticMonkeys.jpg"
 	server := &http.Server{
 		Addr:         cfg.Port,
 		Handler:      mux,
@@ -56,4 +63,9 @@ func (app *App) Run(cfg config.Http) *http.Server {
 		IdleTimeout:  time.Second * time.Duration(cfg.IdleTimeout),  // IdleTimeout is the maximum amount of time to wait for the next request when keep-alives are enabled. If IdleTimeout is zero, the value of ReadTimeout is used. If both are zero, there is no timeout.
 	}
 	return server
+}
+func serveImage(w http.ResponseWriter, r *http.Request) {
+	filePath := filepath.Join(uploadPath, filepath.Base(r.URL.Path))
+	fmt.Println("I am showing file path")
+	http.ServeFile(w, r, filePath)
 }

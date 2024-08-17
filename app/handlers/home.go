@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"forum/app/models"
 	"forum/pkg"
 	"log"
@@ -9,6 +10,7 @@ import (
 
 func (app *App) HomeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
+		fmt.Println("This error in Home")
 		pkg.ErrorHandler(w, http.StatusNotFound)
 		return
 	}
@@ -34,6 +36,7 @@ func (app *App) HomeHandler(w http.ResponseWriter, r *http.Request) {
 		// User:  user,
 		Genre: "/",
 	}
+	fmt.Println("This is A ImageURL: ", posts[0].ImageURL)
 	pkg.RenderTemplate(w, "index.html", data)
 }
 
@@ -53,4 +56,10 @@ func (app *App) WelcomeHandler(w http.ResponseWriter, r *http.Request) {
 		Posts: posts,
 	}
 	pkg.RenderTemplate(w, "welcome.html", data)
+}
+
+func uploadFile(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+
+	}
 }

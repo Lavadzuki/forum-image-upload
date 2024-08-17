@@ -63,7 +63,8 @@
 
     </header>
     <div class="main_item">
-    
+       <!-- <img src="../../{{.ImageURL}}" style="max-width: 100%; max-height: 500px;" /> -->
+
         {{ range .Posts}}
         <section class="post container">
             <a href="/post/comment/{{.Id}}">
@@ -79,6 +80,12 @@
                 <div class="post__content">
                     {{ .Content}}
                 </div>
+                <div>
+                    {{if .ImageURL}}
+                    <img src="{{.ImageURL}}" style="max-width: 100%; max-height: 500px;" />
+                    {{end}}
+                </div>
+                <!-- {{.ImageURL}} -->
                 <div class="post__actions">
                     <form action="/post/like/{{.Id}}" method="post">
                         <input type="hidden" name="isMainPage" value="true">

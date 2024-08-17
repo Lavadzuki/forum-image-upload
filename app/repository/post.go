@@ -38,7 +38,7 @@ type postQuery struct {
 }
 
 func (p postQuery) CreatePost(post models.Post) (int64, error) {
-	res, err := p.db.Exec(`insert into posts (user_id, username, title, message, like, dislike, category, born) VALUES (?,?,?,?,?,?,?,?)`, post.Author.ID, post.Author.Username, post.Title, post.Content, 0, 0, post.Category, post.CreatedTime)
+	res, err := p.db.Exec(`insert into posts (user_id, username, title, message, like, dislike, category, born, image_URL) VALUES (?,?,?,?,?,?,?,?,?)`, post.Author.ID, post.Author.Username, post.Title, post.Content, 0, 0, post.Category, post.CreatedTime, post.ImageURL)
 	if err != nil {
 		log.Println(err)
 		return 0, err

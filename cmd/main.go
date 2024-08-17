@@ -10,8 +10,6 @@ import (
 	"forum/app/service/session"
 	"forum/app/service/user/auth"
 	"forum/app/service/user/user"
-	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -33,11 +31,10 @@ func main() {
 		return
 	}
 
-	http.HandleFunc("/test", uploadPage)
-	http.HandleFunc("/upload", uploadFile)
-	http.HandleFunc("/uploads/", serveImage)
-	fmt.Println("Server starting on http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	// http.HandleFunc("/test", uploadPage)
+	// http.HandleFunc("/uploads/", serveImage)
+	// fmt.Println("Server starting on http://localhost:8080")
+	// http.ListenAndServe(":8080", nil)
 
 	cfg, err := config.InitConfig("./config/config.json")
 	if err != nil {
@@ -91,47 +88,21 @@ func main() {
 	log.Println("server stopped")
 }
 
-func uploadPage(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodGet {
-		tmpl := `<html><body>
-                    <form action="/upload" method="post" enctype="multipart/form-data">
-                        <input type="file" name="file" />
-                        <input type="submit" value="Upload" />
-                    </form>
-                    {{if .ImageURL}}<img src="{{.ImageURL}}" alt="Uploaded Image" style="max-width: 100%; max-height: 500px;" />{{end}}
-                 </body></html>`
-		t, _ := template.New("upload").Parse(tmpl)
-		t.Execute(w, map[string]interface{}{
-			"ImageURL": "/uploads/" + uploadedFile,
-		})
-	}
-}
-
-func uploadFile(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
-		file, _, err := r.FormFile("file")
-		if err != nil {
-			http.Error(w, "File upload error", http.StatusInternalServerError)
-			return
-		}
-		defer file.Close()
-
-		outFile, err := os.Create(filepath.Join(uploadPath, uploadedFile))
-		if err != nil {
-			http.Error(w, "File save error", http.StatusInternalServerError)
-			return
-		}
-		defer outFile.Close()
-
-		_, err = io.Copy(outFile, file)
-		if err != nil {
-			http.Error(w, "File copy error", http.StatusInternalServerError)
-			return
-		}
-
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	}
-}
+// func uploadPage(w http.ResponseWriter, r *http.Request) {
+// 	if r.Method == http.MethodGet {
+// 		tmpl := `<html><body>
+//                     <form action="/upload" method="post" enctype="multipart/form-data">
+//                         <input type="file" name="file" />
+//                         <input type="submit" value="Upload" />
+//                     </form>
+//                     {{if .ImageURL}}<img src="{{.ImageURL}}" alt="Uploaded Image" style="max-width: 100%; max-height: 500px;" />{{end}}
+//                  </body></html>`
+// 		t, _ := template.New("upload").Parse(tmpl)
+// 		t.Execute(w, map[string]interface{}{
+// 			"ImageURL": "/uploads/" + uploadedFile,
+// 		})
+// 	}
+// }
 
 func serveImage(w http.ResponseWriter, r *http.Request) {
 	filePath := filepath.Join(uploadPath, filepath.Base(r.URL.Path))

@@ -21,6 +21,7 @@ func (p postQuery) GetAllCommentByPostId(postId int) ([]models.Comment, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		comments = append(comments, comment)
 	}
 	return comments, nil
