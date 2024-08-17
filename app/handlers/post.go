@@ -47,44 +47,67 @@ func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Handle file upload
 		file, header, err := r.FormFile("file")
-		if err != nil {
+		if err != nil && err != http.ErrMissingFile {
+			// Handle errors other than "missing file" error
 			http.Error(w, "File upload error", http.StatusInternalServerError)
 			return
 		}
-		defer file.Close()
 
-		// Create the uploads directory if it doesn't exist
-		if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
-			err = os.MkdirAll(uploadPath, os.ModePerm)
+		// If no file is uploaded, `err` will be `http.ErrMissingFile` and `file` will be nil
+		if err == http.ErrMissingFile {
+			fmt.Println("NO FILE!!")
+			file = nil
+			header = nil
+		} else {
+			// Handle file operations if a file is present
+			defer file.Close()
+
+			// Ensure upload directory exists
+			if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
+				err = os.MkdirAll(uploadPath, os.ModePerm)
+				if err != nil {
+					http.Error(w, "Failed to create upload directory", http.StatusInternalServerError)
+					return
+				}
+			}
+
+			// Create and save the uploaded file
+			outFile, err := os.Create(filepath.Join(uploadPath, header.Filename))
 			if err != nil {
-				http.Error(w, "Failed to create upload directory", http.StatusInternalServerError)
+				http.Error(w, "File save error", http.StatusInternalServerError)
+				return
+			}
+			defer outFile.Close()
+
+			_, err = io.Copy(outFile, file)
+			if err != nil {
+				http.Error(w, "File copy error", http.StatusInternalServerError)
 				return
 			}
 		}
 
-		outFile, err := os.Create(filepath.Join(uploadPath, header.Filename))
-		if err != nil {
-			http.Error(w, "File save error", http.StatusInternalServerError)
-			return
+		var post models.Post
+		if header != nil {
+			post = models.Post{
+				Title:       title,
+				Content:     message,
+				Category:    models.Stringslice(genre),
+				Author:      user,
+				CreatedTime: time.Now().Format(time.RFC822),
+				ImageURL:    "/uploads/" + header.Filename,
+			}
+		} else {
+			post = models.Post{
+				Title:       title,
+				Content:     message,
+				Category:    models.Stringslice(genre),
+				Author:      user,
+				CreatedTime: time.Now().Format(time.RFC822),
+				ImageURL:    "",
+			}
 		}
-		defer outFile.Close()
 
-		_, err = io.Copy(outFile, file)
-		if err != nil {
-			http.Error(w, "File copy error", http.StatusInternalServerError)
-			return
-		}
-
-		post := models.Post{
-			Title:       title,
-			Content:     message,
-			Category:    models.Stringslice(genre),
-			Author:      user,
-			CreatedTime: time.Now().Format(time.RFC822),
-			ImageURL:    "/uploads/" + header.Filename,
-		}
 		// fmt.Println("This is ImageURL", post.ImageURL)
 		status, err := app.postService.CreatePost(&post)
 		if err != nil {
