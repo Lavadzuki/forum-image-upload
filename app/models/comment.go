@@ -9,4 +9,5 @@ type Comment struct {
 	Like     int
 	Dislike  int
 	Born     string
+	ImageURL string
 }

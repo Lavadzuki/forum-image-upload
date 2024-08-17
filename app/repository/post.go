@@ -92,9 +92,9 @@ func (p postQuery) GetAllPosts() ([]models.Post, error) {
 }
 
 func (p postQuery) GetPostById(postId int64) (models.Post, error) {
-	row := p.db.QueryRow(`select post_id,title,message,user_id,username,like,dislike, category, born from posts where post_id=?`, postId)
+	row := p.db.QueryRow(`select post_id,title,message,user_id,username,like,dislike, category, born, image_URL from posts where post_id=?`, postId)
 	var post models.Post
-	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.Author.ID, &post.Author.Username, &post.Like, &post.Dislike, &post.Category, &post.CreatedTime)
+	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.Author.ID, &post.Author.Username, &post.Like, &post.Dislike, &post.Category, &post.CreatedTime, &post.ImageURL)
 	if err != nil {
 		return models.Post{}, err
 	}

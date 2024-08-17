@@ -29,6 +29,11 @@
         <div class="post__content">
             {{ .InitialPost.Content }}
         </div>
+        <div>
+            {{if .InitialPost.ImageURL}} 
+            <img src="{{.InitialPost.ImageURL}}" style="max-width: 100%; max-height: 300px;" />
+            {{end}} 
+        </div>
         <div class="post__actions">
             <form action="/post/like/{{.InitialPost.Id}}" method="post">
                 <input type="hidden" name="isMainPage" value="false">

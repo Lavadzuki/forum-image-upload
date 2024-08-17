@@ -36,7 +36,7 @@ func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 		genre := r.Form["category"]
 
 		if len(genre) == 0 {
-			fmt.Println("StatusBad")
+			fmt.Println("StatusBad is here")
 			pkg.ErrorHandler(w, http.StatusBadRequest)
 			return
 		}
@@ -49,21 +49,17 @@ func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 
 		file, header, err := r.FormFile("file")
 		if err != nil && err != http.ErrMissingFile {
-			// Handle errors other than "missing file" error
 			http.Error(w, "File upload error", http.StatusInternalServerError)
 			return
 		}
 
-		// If no file is uploaded, `err` will be `http.ErrMissingFile` and `file` will be nil
 		if err == http.ErrMissingFile {
 			fmt.Println("NO FILE!!")
 			file = nil
 			header = nil
 		} else {
-			// Handle file operations if a file is present
 			defer file.Close()
 
-			// Ensure upload directory exists
 			if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
 				err = os.MkdirAll(uploadPath, os.ModePerm)
 				if err != nil {
@@ -72,7 +68,6 @@ func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
-			// Create and save the uploaded file
 			outFile, err := os.Create(filepath.Join(uploadPath, header.Filename))
 			if err != nil {
 				http.Error(w, "File save error", http.StatusInternalServerError)

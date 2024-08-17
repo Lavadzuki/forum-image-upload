@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"forum/app/models"
 	"forum/pkg"
 	"log"
@@ -34,6 +35,8 @@ func (app *App) CommentHandler(w http.ResponseWriter, r *http.Request) {
 			Comment:     initialPost.Comment,
 			InitialPost: initialPost,
 		}
+
+		fmt.Println("This is an IMAGE URL: ", initialPost.ImageURL)
 
 		pkg.RenderTemplate(w, "commentview.html", data)
 	case http.MethodPost:
