@@ -13,8 +13,9 @@ import (
 )
 
 const (
-	uploadPath   = "./uploads"
-	uploadedFile = "uploaded_image"
+	uploadPath    = "./uploads"
+	uploadedFile  = "uploaded_image"
+	maxUploadSize = 20 << 20 // 20 MB
 )
 
 func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
@@ -24,9 +25,9 @@ func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	case http.MethodPost:
 		// Parse the multipart form
-		err := r.ParseMultipartForm(10 << 20) // 10 MB
+		err := r.ParseMultipartForm(maxUploadSize)
 		if err != nil {
-			http.Error(w, "Error parsing form", http.StatusInternalServerError)
+			pkg.ErrorHandler(w, http.StatusInternalServerError)
 			return
 		}
 
@@ -60,6 +61,14 @@ func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			defer file.Close()
 
+			// Check file size
+			if header.Size > maxUploadSize {
+				// http.Error(w, "File too large. Maximum size is 20MB.", http.StatusBadRequest)
+				pkg.ErrorHandler(w, http.StatusInternalServerError)
+				return
+			}
+
+			// Ensure the upload directory exists
 			if _, err := os.Stat(uploadPath); os.IsNotExist(err) {
 				err = os.MkdirAll(uploadPath, os.ModePerm)
 				if err != nil {
@@ -68,6 +77,7 @@ func (app *App) PostHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 
+			// Create the file in the upload directory
 			outFile, err := os.Create(filepath.Join(uploadPath, header.Filename))
 			if err != nil {
 				http.Error(w, "File save error", http.StatusInternalServerError)
